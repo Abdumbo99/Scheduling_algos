@@ -1,11 +1,12 @@
 #include <stdio.h>
 #define MAXSIZE 1000
-#define DATA_NUMBER 3
-#define QUEUE_DATA_NUMBER 4
+#define DATA_NUMBER 3           //2nd dimension of bursts
+#define QUEUE_DATA_NUMBER 4     //2nd dimension of queue
+//indices
 #define BURST_NUMBER_INDEX 0
 #define ARRIVAL_TIME_INDEX 1
 #define BURST_LENGTH_INDEX 2
-#define TIME_TURNAROUND 3
+#define TIME_TURNAROUND_INDEX 3
 
 struct ProcessesData_s
 {
@@ -18,6 +19,7 @@ struct ProcessesQueue_s
 {
     int bursts_enqueued[MAXSIZE][QUEUE_DATA_NUMBER];
     int count;
+    int finished;
 };
 typedef struct ProcessesQueue_s ProcessesQueue;
 
@@ -41,23 +43,34 @@ void enqueue_process (ProcessesQueue *processesQueue, int arrivalTime, int burst
 }
 
 int consume_from_queue (ProcessesQueue *processesQueue, int index){
-    if (processesQueue->bursts_enqueued[index][BURST_LENGTH_INDEX] > 0) {
-        processesQueue->bursts_enqueued[index][TIME_TURNAROUND]++;
-        processesQueue->bursts_enqueued[index][BURST_LENGTH_INDEX]--;
-        return 0;
+    processesQueue->bursts_enqueued[index][TIME_TURNAROUND_INDEX]++;
+    processesQueue->bursts_enqueued[index][BURST_LENGTH_INDEX]--;
+    if (processesQueue->bursts_enqueued[index][BURST_LENGTH_INDEX] == 0) {
+        processesQueue->finished++;
+        return -1;
     }
-    return -1;
+   return 0;
+}
+
+void update_turnaround_time (ProcessesQueue *processesQueue){
+    for (int i =0; i < processesQueue->count-1; i++)
+    {
+        if (processesQueue->bursts_enqueued[i][BURST_LENGTH_INDEX] > 0)
+        {
+            processesQueue->bursts_enqueued[i][TIME_TURNAROUND_INDEX]++;
+        }
+    }
 }
 // in use , left time, and we have to increment counter for all in use processes
 double turnaround_time_FCFS(int processDataArray[MAXSIZE][DATA_NUMBER], int size)
 {
     ProcessesQueue pQueue;
     pQueue.count = 0;
+    pQueue.finished = 0;
     int sourceCurrentIndex = 0;
     int queueCurrentIndex = 0;
     int timer = 0;
-    int done = 0;
-    while (!done)
+    while (size > pQueue.finished) //last element reached but not done
     {
         //first add
         if (timer == processDataArray[sourceCurrentIndex][ARRIVAL_TIME_INDEX])
@@ -71,8 +84,7 @@ double turnaround_time_FCFS(int processDataArray[MAXSIZE][DATA_NUMBER], int size
         {
             queueCurrentIndex++;
         }
-        if (size > queueCurrentIndex)
-            done = 1;
+        update_turnaround_time(&pQueue);
         timer++;
     }
     return 0.0;
@@ -115,7 +127,7 @@ double turnaround_time_SJF(int processDataArray[MAXSIZE][DATA_NUMBER], int count
         turnaroundTotalTime = turnaroundTotalTime - processDataArray[i][ARRIVAL_TIME_INDEX];
     }
     turnaroundAvg = turnaroundTotalTime / count;
-    printf("Avg turnaround: %fl\n", turnaroundAvg);
+    printf("Avg turnaround: %lf\n", turnaroundAvg);
     return turnaroundAvg;
 }
 
@@ -140,17 +152,17 @@ int main()
     enqueue_process(&qData, 15, 25);
     enqueue_process(&qData, 10, 2);
     printf("turnaround time is %d and length remaining is %d\n",
-           qData.bursts_enqueued[0][TIME_TURNAROUND], qData.bursts_enqueued[0][BURST_LENGTH_INDEX]);
+           qData.bursts_enqueued[0][TIME_TURNAROUND_INDEX], qData.bursts_enqueued[0][BURST_LENGTH_INDEX]);
     printf("turnaround time is %d and length remaining is %d\n",
-           qData.bursts_enqueued[1][TIME_TURNAROUND], qData.bursts_enqueued[1][BURST_LENGTH_INDEX]);
+           qData.bursts_enqueued[1][TIME_TURNAROUND_INDEX], qData.bursts_enqueued[1][BURST_LENGTH_INDEX]);
 
     consume_from_queue(&qData, 0);
     consume_from_queue(&qData, 0);
     printf("turnaround time is %d and length remaining is %d\n",
-           qData.bursts_enqueued[0][TIME_TURNAROUND], qData.bursts_enqueued[0][BURST_LENGTH_INDEX]);
+           qData.bursts_enqueued[0][TIME_TURNAROUND_INDEX], qData.bursts_enqueued[0][BURST_LENGTH_INDEX]);
     consume_from_queue(&qData, 1);
     printf("turnaround time is %d and length remaining is %d\n",
-           qData.bursts_enqueued[1][TIME_TURNAROUND], qData.bursts_enqueued[1][BURST_LENGTH_INDEX]);
+           qData.bursts_enqueued[1][TIME_TURNAROUND_INDEX], qData.bursts_enqueued[1][BURST_LENGTH_INDEX]);
 
     FILE *fp;
     char *name = "input.txt";
