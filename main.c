@@ -60,6 +60,7 @@ int consume_from_queue(ProcessesQueue *processesQueue, int index)
     processesQueue->bursts_enqueued[index][BURST_LENGTH_INDEX]--;
     if (processesQueue->bursts_enqueued[index][BURST_LENGTH_INDEX] == 0)
     {
+        processesQueue->bursts_enqueued[index][TIME_TURNAROUND_INDEX]++;
         processesQueue->finished++;
         return -1;
     }
@@ -254,16 +255,6 @@ int main()
     ProcessesData prData;
     prData.count = 0;
 
-
-  //  printf("turnaround time is %d and length remaining is %d\n",
-  //         qData.bursts_enqueued[0][TIME_TURNAROUND_INDEX], qData.bursts_enqueued[0][BURST_LENGTH_INDEX]);
-  //  printf("turnaround time is %d and length remaining is %d\n",
-  //         qData.bursts_enqueued[1][TIME_TURNAROUND_INDEX], qData.bursts_enqueued[1][BURST_LENGTH_INDEX]);
-  //  printf("turnaround time is %d and length remaining is %d\n",
-  //         qData.bursts_enqueued[0][TIME_TURNAROUND_INDEX], qData.bursts_enqueued[0][BURST_LENGTH_INDEX]);
-  //  printf("turnaround time is %d and length remaining is %d\n",
-  //          qData.bursts_enqueued[1][TIME_TURNAROUND_INDEX], qData.bursts_enqueued[1][BURST_LENGTH_INDEX]);
-
     FILE *fp;
     char *name = "input.txt";
     printf("file name %s \n", name);
@@ -285,11 +276,9 @@ int main()
         printf("count is %d and arrival time %d and length is %d \n", prData.count, prData.bursts_info[i][1], prData.bursts_info[i][2]);
     }
 
-   //turnaround_time_SJF(prData.bursts_info, prData.count);
-   // turnaround_time_SRTF(prData.bursts_info, prData.count);
    ProcessesQueue qData;
     qData.count = 0;
- // printf("average turnaround for RR is %.2lf\n", turnaround_time_RR(prData.bursts_info, prData.count,10));
+  printf("average turnaround for RR is %.2lf\n", turnaround_time_RR(prData.bursts_info, prData.count,10));
   printf("average turnaround for RR is %.2lf\n", turnaround_time_RR(prData.bursts_info, prData.count,5));
   printf("average turnaround for FCFS is %.2lf\n", turnaround_time_FCFS(prData.bursts_info, prData.count));
 
