@@ -57,7 +57,6 @@ void enqueue_process(ProcessesQueue *processesQueue,const int arrivalTime ,const
 
 int consume_from_queue(ProcessesQueue *processesQueue, int index)
 {
-    processesQueue->bursts_enqueued[index][TIME_TURNAROUND_INDEX]++;
     processesQueue->bursts_enqueued[index][BURST_LENGTH_INDEX]--;
     if (processesQueue->bursts_enqueued[index][BURST_LENGTH_INDEX] == 0)
     {
@@ -69,7 +68,7 @@ int consume_from_queue(ProcessesQueue *processesQueue, int index)
 
 void update_turnaround_time(ProcessesQueue *processesQueue)
 {
-    for (int i = 0; i < processesQueue->count - 1; i++)
+    for (int i = 0; i < processesQueue->count; i++)
     {
         if (processesQueue->bursts_enqueued[i][BURST_LENGTH_INDEX] > 0)
         {
@@ -90,7 +89,7 @@ double turnaround_time_FCFS(const int processDataArray[MAXSIZE][DATA_NUMBER], co
     int sourceCurrentIndex = 0;
     int queueCurrentIndex = 0;
     int timer = 0;
-    while (size > pQueue.finished) //last element reached but not done
+    while (size > pQueue.finished)
     {
         //first add
         if (timer == processDataArray[sourceCurrentIndex][ARRIVAL_TIME_INDEX])
@@ -109,6 +108,8 @@ double turnaround_time_FCFS(const int processDataArray[MAXSIZE][DATA_NUMBER], co
     }
     double totalTurnaround = 0.0;
     for (int i = 0; i < pQueue.count; i++){
+        printf("turnaround tine for this burst is %d \n", pQueue.bursts_enqueued[i][TIME_TURNAROUND_INDEX] );
+
         totalTurnaround += pQueue.bursts_enqueued[i][TIME_TURNAROUND_INDEX];
     }
     return totalTurnaround / (double) pQueue.count;
@@ -241,6 +242,7 @@ double turnaround_time_RR(const int processDataArray[MAXSIZE][DATA_NUMBER], cons
     }
     double totalTurnaround = 0.0;
     for (int i = 0; i < pQueue.count; i++){
+        printf("turnaround tine for this burst is  %d\n", pQueue.bursts_enqueued[i][TIME_TURNAROUND_INDEX] );
         totalTurnaround += pQueue.bursts_enqueued[i][TIME_TURNAROUND_INDEX];
     }
 
@@ -283,13 +285,13 @@ int main()
         printf("count is %d and arrival time %d and length is %d \n", prData.count, prData.bursts_info[i][1], prData.bursts_info[i][2]);
     }
 
-   // turnaround_time_SJF(prData.bursts_info, prData.count);
-  //  turnaround_time_SRTF(prData.bursts_info, prData.count);
+   //turnaround_time_SJF(prData.bursts_info, prData.count);
+   // turnaround_time_SRTF(prData.bursts_info, prData.count);
    ProcessesQueue qData;
     qData.count = 0;
-  printf("average turnaround for RR is %.2lf\n", turnaround_time_RR(prData.bursts_info, prData.count,10));
-  printf("average turnaround for RR is %.2lf\n", turnaround_time_RR(prData.bursts_info, prData.count,10));
-  printf("average turnaround for FCFS is %.2lf", turnaround_time_FCFS(prData.bursts_info, prData.count));
+ // printf("average turnaround for RR is %.2lf\n", turnaround_time_RR(prData.bursts_info, prData.count,10));
+  printf("average turnaround for RR is %.2lf\n", turnaround_time_RR(prData.bursts_info, prData.count,5));
+  printf("average turnaround for FCFS is %.2lf\n", turnaround_time_FCFS(prData.bursts_info, prData.count));
 
     return 0;
 }
