@@ -1,7 +1,8 @@
 #include <stdio.h>
 #define MAXSIZE 1000
-#define DATA_NUMBER 3           //2nd dimension of bursts
-#define QUEUE_DATA_NUMBER 4     //2nd dimension of queue
+#define MAX_BURST_SIZE 400
+#define DATA_NUMBER 3       //2nd dimension of bursts
+#define QUEUE_DATA_NUMBER 4 //2nd dimension of queue
 //indices
 #define BURST_NUMBER_INDEX 0
 #define ARRIVAL_TIME_INDEX 1
@@ -35,25 +36,29 @@ void add_process_data(ProcessesData *processData, int arrivalTime, int burstLeng
  * As we are progressing with processing of the bursts we keep ones with past arrival time here
  * We update turnaround time as they get processed.
 */
-void enqueue_process (ProcessesQueue *processesQueue, int arrivalTime, int burstLength){
+void enqueue_process(ProcessesQueue *processesQueue, int arrivalTime, int burstLength)
+{
     processesQueue->bursts_enqueued[processesQueue->count][BURST_NUMBER_INDEX] = processesQueue->count;
     processesQueue->bursts_enqueued[processesQueue->count][ARRIVAL_TIME_INDEX] = arrivalTime;
     processesQueue->bursts_enqueued[processesQueue->count][BURST_LENGTH_INDEX] = burstLength;
     processesQueue->count++;
 }
 
-int consume_from_queue (ProcessesQueue *processesQueue, int index){
+int consume_from_queue(ProcessesQueue *processesQueue, int index)
+{
     processesQueue->bursts_enqueued[index][TIME_TURNAROUND_INDEX]++;
     processesQueue->bursts_enqueued[index][BURST_LENGTH_INDEX]--;
-    if (processesQueue->bursts_enqueued[index][BURST_LENGTH_INDEX] == 0) {
+    if (processesQueue->bursts_enqueued[index][BURST_LENGTH_INDEX] == 0)
+    {
         processesQueue->finished++;
         return -1;
     }
-   return 0;
+    return 0;
 }
 
-void update_turnaround_time (ProcessesQueue *processesQueue){
-    for (int i =0; i < processesQueue->count-1; i++)
+void update_turnaround_time(ProcessesQueue *processesQueue)
+{
+    for (int i = 0; i < processesQueue->count - 1; i++)
     {
         if (processesQueue->bursts_enqueued[i][BURST_LENGTH_INDEX] > 0)
         {
@@ -75,12 +80,12 @@ double turnaround_time_FCFS(int processDataArray[MAXSIZE][DATA_NUMBER], int size
         //first add
         if (timer == processDataArray[sourceCurrentIndex][ARRIVAL_TIME_INDEX])
         {
-            enqueue_process(&pQueue,processDataArray[sourceCurrentIndex][ARRIVAL_TIME_INDEX],
+            enqueue_process(&pQueue, processDataArray[sourceCurrentIndex][ARRIVAL_TIME_INDEX],
                             processDataArray[sourceCurrentIndex][BURST_LENGTH_INDEX]);
             sourceCurrentIndex++;
         }
         //second consume
-        if (consume_from_queue(&pQueue,queueCurrentIndex) == -1)
+        if (consume_from_queue(&pQueue, queueCurrentIndex) == -1)
         {
             queueCurrentIndex++;
         }
@@ -93,8 +98,8 @@ double turnaround_time_FCFS(int processDataArray[MAXSIZE][DATA_NUMBER], int size
 double turnaround_time_SJF(int processDataArray[MAXSIZE][DATA_NUMBER], int count)
 {
     printf("\n\n========SJF=======\n\n");
-    double waitingAvg = 0, turnaroundAvg = 0, turnaroundTotalTime = 0, waitingTotalSum = 0;
-    int waitTime[count];
+    double turnaroundAvg = 0, turnaroundTotalTime = 0;
+    double passedTime = 0;
     float burstTime = 0;
     int min;
     int minIndex = 1;
@@ -127,8 +132,9 @@ double turnaround_time_SJF(int processDataArray[MAXSIZE][DATA_NUMBER], int count
     for (int i = 0; i < count; i++)
     {
         printf("burst index is %d and arrival time %d and length is %d \n", processDataArray[i][BURST_NUMBER_INDEX], processDataArray[i][ARRIVAL_TIME_INDEX], processDataArray[i][BURST_LENGTH_INDEX]);
-        turnaroundTotalTime = turnaroundTotalTime + processDataArray[i][BURST_LENGTH_INDEX];
-        turnaroundTotalTime = turnaroundTotalTime - processDataArray[i][ARRIVAL_TIME_INDEX];
+        passedTime = passedTime + processDataArray[i][BURST_LENGTH_INDEX];
+        double turaroundTime = passedTime - processDataArray[i][ARRIVAL_TIME_INDEX];
+        turnaroundTotalTime = turnaroundTotalTime + turaroundTime;
     }
     turnaroundAvg = turnaroundTotalTime / count;
     printf("Avg turnaround: %lf\n", turnaroundAvg);
@@ -138,22 +144,41 @@ double turnaround_time_SJF(int processDataArray[MAXSIZE][DATA_NUMBER], int count
 double turnaround_time_SRTF(int processDataArray[MAXSIZE][DATA_NUMBER], int count)
 {
     printf("\n\n========SRJF=======\n\n");
-    double waitingAvg = 0, turnaroundAvg = 0, turnaroundTotalTime = 0, waitingTotalSum = 0;
-    int waitTime[count];
+    double turnaroundAvg = 0, turnaroundTotalTime = 0, turnaroundTime = 0;
     float burstTime = 0;
-    int min;
-    int minIndex = 1;
+    int index = 1;
     int complate = 0;
-    ProcessesData prData;
-    prData.count = 0;
-    for (int i = 0; complate != count; i++)
+    int passedTime = 0;
+
+    processDataArray[count + 1][BURST_LENGTH_INDEX] = MAX_BURST_SIZE; // create a burst with max burst size
+    while (complate != count)
     {
+        index = count + 1; // set index to max burst
+
+        // pick the burst with minin burst lenght from the arrivied ones
+        for (int i = 0; i < count; i++)
+        {
+            if (processDataArray[i][BURST_LENGTH_INDEX] < processDataArray[index][BURST_LENGTH_INDEX] && passedTime >= processDataArray[i][ARRIVAL_TIME_INDEX] && processDataArray[i][BURST_LENGTH_INDEX] > 0)
+            {
+                index = i;
+            }
+        }
+        // process only one time unit
+        processDataArray[index][BURST_LENGTH_INDEX]--;
+
+        // a burst is end it add to compete list and calculate turnaround time
+        if (processDataArray[index][BURST_LENGTH_INDEX] == 0)
+        {
+            complate++;
+            turnaroundTime = passedTime + 1 - processDataArray[index][ARRIVAL_TIME_INDEX];
+            turnaroundTotalTime += turnaroundTime;
+        }
+        passedTime++;
     }
-    for (int i = 0; i < count; i++)
-    {
-        printf("index is %d and arrival time %d and length is %d \n", count, processDataArray[i][ARRIVAL_TIME_INDEX], processDataArray[i][BURST_LENGTH_INDEX]);
-    }
-    return 0.0;
+
+    turnaroundAvg = turnaroundTotalTime / count;
+    printf("Avg turnaround: %lf\n", turnaroundAvg);
+    return turnaroundAvg;
 }
 
 double turnaround_time_RR(int processDataArray[MAXSIZE][DATA_NUMBER], int count, int q)
@@ -206,6 +231,6 @@ int main()
     }
 
     turnaround_time_SJF(prData.bursts_info, prData.count);
-
+    turnaround_time_SRTF(prData.bursts_info, prData.count);
     return 0;
 }
