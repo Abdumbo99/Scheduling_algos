@@ -34,7 +34,7 @@ double turnaround_time_SJF(int processDataArray[MAXSIZE][DATA_NUMBER], int count
     int minIndex = 1;
     for (int i = 0; i < count; i++)
     {
-        burstTime = burstTime + processDataArray[i][2];
+        burstTime = burstTime + processDataArray[i][BURST_LENGTH_INDEX];
 
         min = processDataArray[minIndex][BURST_LENGTH_INDEX];
         for (int j = minIndex; j < count; j++)
@@ -50,13 +50,17 @@ double turnaround_time_SJF(int processDataArray[MAXSIZE][DATA_NUMBER], int count
                 temp = processDataArray[minIndex][BURST_LENGTH_INDEX];
                 processDataArray[minIndex][BURST_LENGTH_INDEX] = processDataArray[j][BURST_LENGTH_INDEX];
                 processDataArray[j][BURST_LENGTH_INDEX] = temp;
+
+                temp = processDataArray[minIndex][BURST_NUMBER_INDEX];
+                processDataArray[minIndex][BURST_NUMBER_INDEX] = processDataArray[j][BURST_NUMBER_INDEX];
+                processDataArray[j][BURST_NUMBER_INDEX] = temp;
             }
         }
         minIndex++;
     }
     for (int i = 0; i < count; i++)
     {
-        printf("index is %d and arrival time %d and length is %d \n", count, processDataArray[i][ARRIVAL_TIME_INDEX], processDataArray[i][BURST_LENGTH_INDEX]);
+        printf("burst index is %d and arrival time %d and length is %d \n", processDataArray[i][BURST_NUMBER_INDEX], processDataArray[i][ARRIVAL_TIME_INDEX], processDataArray[i][BURST_LENGTH_INDEX]);
         turnaroundTotalTime = turnaroundTotalTime + processDataArray[i][BURST_LENGTH_INDEX];
         turnaroundTotalTime = turnaroundTotalTime - processDataArray[i][ARRIVAL_TIME_INDEX];
     }
@@ -66,6 +70,22 @@ double turnaround_time_SJF(int processDataArray[MAXSIZE][DATA_NUMBER], int count
 }
 double turnaround_time_SRTF(int processDataArray[MAXSIZE][DATA_NUMBER], int count)
 {
+    printf("\n\n========SRJF=======\n\n");
+    double waitingAvg = 0, turnaroundAvg = 0, turnaroundTotalTime = 0, waitingTotalSum = 0;
+    int waitTime[count];
+    float burstTime = 0;
+    int min;
+    int minIndex = 1;
+    int complate = 0;
+    ProcessesData prData;
+    prData.count = 0;
+    for (int i = 0; complate != count; i++)
+    {
+    }
+    for (int i = 0; i < count; i++)
+    {
+        printf("index is %d and arrival time %d and length is %d \n", count, processDataArray[i][ARRIVAL_TIME_INDEX], processDataArray[i][BURST_LENGTH_INDEX]);
+    }
     return 0.0;
 }
 double turnaround_time_RR(int processDataArray[MAXSIZE][DATA_NUMBER], int count, int q)
