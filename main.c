@@ -169,9 +169,9 @@ double turnaround_time_SJF(int const processDataArray[MAXSIZE][DATA_NUMBER], int
 
     for (int i = 0; i < count; i++)
     {
-
+        // in dataArray burst are ordered
         passedTime = passedTime + dataArray[i][BURST_LENGTH_INDEX];
-        double turaroundTime = passedTime - dataArray[i][ARRIVAL_TIME_INDEX];
+        double turaroundTime = passedTime - dataArray[i][ARRIVAL_TIME_INDEX]; // calculate turaroundTime time 
         turnaroundTotalTime = turnaroundTotalTime + turaroundTime;
     }
     turnaroundAvg = turnaroundTotalTime / count;
