@@ -109,7 +109,7 @@ double turnaround_time_FCFS(const int processDataArray[MAXSIZE][DATA_NUMBER], co
     }
     double totalTurnaround = 0.0;
     for (int i = 0; i < pQueue.count; i++){
-        printf("turnaround tine for this burst is %d \n", pQueue.bursts_enqueued[i][TIME_TURNAROUND_INDEX] );
+        printf("turnaround time for this burst is %d \n", pQueue.bursts_enqueued[i][TIME_TURNAROUND_INDEX] );
         totalTurnaround += pQueue.bursts_enqueued[i][TIME_TURNAROUND_INDEX];
     }
     return totalTurnaround / (double) pQueue.count;
@@ -213,7 +213,6 @@ double turnaround_time_RR(const int processDataArray[MAXSIZE][DATA_NUMBER], cons
     pQueue.finished = 0;
     int sourceCurrentIndex = 0;
     int queueCurrentIndex = 0;
-    int processCurrentIndex = 0;
     int timer = 0;
     int pTimer = 0;
     while (size > pQueue.finished) //last element reached but not done
@@ -223,33 +222,24 @@ double turnaround_time_RR(const int processDataArray[MAXSIZE][DATA_NUMBER], cons
         {
             enqueue_process(&pQueue, processDataArray[sourceCurrentIndex][ARRIVAL_TIME_INDEX],
                             processDataArray[sourceCurrentIndex][BURST_LENGTH_INDEX]);
-            printf("added %d at %d and %d\n",sourceCurrentIndex, timer, pTimer );
-
             sourceCurrentIndex++;
         }
         if (pTimer == q ) // go to next job
         {
-            printf("switched %d at %d and %d\n",queueCurrentIndex, timer, pTimer );
-            printf("switched %d \n", pQueue.bursts_enqueued[queueCurrentIndex][BURST_LENGTH_INDEX]);
-
             queueCurrentIndex = (queueCurrentIndex + 1) % pQueue.count;
             while  (pQueue.bursts_enqueued[queueCurrentIndex][BURST_LENGTH_INDEX] == 0)
             {
                 queueCurrentIndex = (queueCurrentIndex + 1) % pQueue.count;
             }
             pTimer = 0;
-
         }
         //second consume
         if (consume_from_queue(&pQueue, queueCurrentIndex) == -1)
         {
-            printf("consumed %d at %d and %d\n",queueCurrentIndex, timer, pTimer );
             pTimer = 0;
             queueCurrentIndex = (queueCurrentIndex + 1) % pQueue.count;
-            int limit = 0;
-            while  (pQueue.bursts_enqueued[queueCurrentIndex][BURST_LENGTH_INDEX] == 0 && limit < pQueue.count)
+            while  (pQueue.bursts_enqueued[queueCurrentIndex][BURST_LENGTH_INDEX] == 0 && size > pQueue.finished )
             {
-                limit++;
                 queueCurrentIndex = (queueCurrentIndex + 1) % pQueue.count;
             }
         }
