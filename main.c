@@ -176,8 +176,11 @@ double turnaround_time_SJF(int const processDataArray[MAXSIZE][DATA_NUMBER], int
         }
         minIndex++;
     }
+
     for (int i = 0; i < count; i++)
     {
+        if(passedTime < dataArray[i][ARRIVAL_TIME_INDEX])
+            passedTime = dataArray[i][ARRIVAL_TIME_INDEX];
         passedTime = passedTime + dataArray[i][BURST_LENGTH_INDEX];
         double turaroundTime = passedTime - dataArray[i][ARRIVAL_TIME_INDEX];
         turnaroundTotalTime = turnaroundTotalTime + turaroundTime;
