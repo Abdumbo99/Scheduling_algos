@@ -240,8 +240,8 @@ double turnaround_time_RR(const int processDataArray[MAXSIZE][DATA_NUMBER], cons
     int sourceCurrentIndex = 0;
     int queueCurrentIndex = 0;
     int processCurrentIndex = 0;
-    int timer = 0;
-    int pTimer = 0;
+    int timer = processDataArray[sourceCurrentIndex][ARRIVAL_TIME_INDEX];
+    int pTimer = processDataArray[sourceCurrentIndex][ARRIVAL_TIME_INDEX] % q;
     while (size > pQueue.finished) //last element reached but not done
     {
         //first add
