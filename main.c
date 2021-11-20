@@ -58,14 +58,25 @@ void enqueue_process(ProcessesQueue *processesQueue, const int arrivalTime, cons
 
 int consume_from_queue(ProcessesQueue *processesQueue, int index)
 {
-    processesQueue->bursts_enqueued[index][BURST_LENGTH_INDEX]--;
-    if (processesQueue->bursts_enqueued[index][BURST_LENGTH_INDEX] == 0)
-    {
-        processesQueue->bursts_enqueued[index][TIME_TURNAROUND_INDEX]++;
-        processesQueue->finished++;
-        return -1;
+    if (processesQueue->bursts_enqueued[index][BURST_LENGTH_INDEX] > 0){
+        processesQueue->bursts_enqueued[index][BURST_LENGTH_INDEX]--;
+
+        printf ("[consume] %d's length is  : %d \n", index,
+                processesQueue->bursts_enqueued[index][BURST_LENGTH_INDEX]);
+
+        if (processesQueue->bursts_enqueued[index][BURST_LENGTH_INDEX] == 0)
+        {
+            processesQueue->bursts_enqueued[index][TIME_TURNAROUND_INDEX]++;
+          //  printf ("[consume] updated turnaround of %d now it is %d with length of: %d \n", index,
+           //         processesQueue->bursts_enqueued[index][TIME_TURNAROUND_INDEX], processesQueue->bursts_enqueued[index][BURST_LENGTH_INDEX]);
+            processesQueue->finished++;
+            return -1;
+        }
+        else {
+            return 0;
+        }
     }
-    return 0;
+    return -1;
 }
 
 void update_turnaround_time(ProcessesQueue *processesQueue)
@@ -75,6 +86,8 @@ void update_turnaround_time(ProcessesQueue *processesQueue)
         if (processesQueue->bursts_enqueued[i][BURST_LENGTH_INDEX] > 0)
         {
             processesQueue->bursts_enqueued[i][TIME_TURNAROUND_INDEX]++;
+       //     printf ("[update] updated turnaround of %d now it is %d with length of: %d \n", i,
+         //           processesQueue->bursts_enqueued[i][TIME_TURNAROUND_INDEX], processesQueue->bursts_enqueued[i][BURST_LENGTH_INDEX]);
         }
     }
 }
@@ -151,7 +164,7 @@ double turnaround_time_SJF(int const processDataArray[MAXSIZE][DATA_NUMBER], int
             {
                 min = dataArray[j][BURST_LENGTH_INDEX];
 
-                // Swap the place of the burst by swapping datas
+                // Swap the place of the burst by swapping data
                 // swap ARRIVAL_TIME_INDEX
                 int temp = dataArray[minIndex][ARRIVAL_TIME_INDEX];
                 dataArray[minIndex][ARRIVAL_TIME_INDEX] = dataArray[j][ARRIVAL_TIME_INDEX];
@@ -202,7 +215,7 @@ double turnaround_time_SRTF(int const processDataArray[MAXSIZE][DATA_NUMBER], in
     {
         index = count + 1; // set index to max burst
 
-        // pick the burst with minin burst lenght from the arrivied ones
+        // pick the burst with minimum burst length from the arrived ones
         for (int i = 0; i < count; i++)
         {
             if (dataArray[i][BURST_LENGTH_INDEX] < dataArray[index][BURST_LENGTH_INDEX] &&
@@ -214,7 +227,7 @@ double turnaround_time_SRTF(int const processDataArray[MAXSIZE][DATA_NUMBER], in
         // process only one time unit
         dataArray[index][BURST_LENGTH_INDEX]--;
 
-        // a burst is end it add to compete list and calculate turnaround time
+        // a burst is end it, add to compete list and calculate turnaround time
         if (dataArray[index][BURST_LENGTH_INDEX] == 0)
         {
             complate++;
@@ -232,14 +245,12 @@ double turnaround_time_SRTF(int const processDataArray[MAXSIZE][DATA_NUMBER], in
 double turnaround_time_RR(const int processDataArray[MAXSIZE][DATA_NUMBER], const int size, int q)
 {
     printf("RR\n");
-
     ProcessesQueue pQueue;
     reset_memory(&pQueue);
     pQueue.count = 0;
     pQueue.finished = 0;
     int sourceCurrentIndex = 0;
     int queueCurrentIndex = 0;
-    int processCurrentIndex = 0;
     int timer = processDataArray[sourceCurrentIndex][ARRIVAL_TIME_INDEX];
     int pTimer = processDataArray[sourceCurrentIndex][ARRIVAL_TIME_INDEX] % q;
     while (size > pQueue.finished) //last element reached but not done
@@ -249,15 +260,13 @@ double turnaround_time_RR(const int processDataArray[MAXSIZE][DATA_NUMBER], cons
         {
             enqueue_process(&pQueue, processDataArray[sourceCurrentIndex][ARRIVAL_TIME_INDEX],
                             processDataArray[sourceCurrentIndex][BURST_LENGTH_INDEX]);
-            //printf("added %d at %d and %d\n", sourceCurrentIndex, timer, pTimer);
-
+            printf ("started with turnaround: %d, and length: %d\n",
+                    pQueue.bursts_enqueued[pQueue.count-1][TIME_TURNAROUND_INDEX],
+                    pQueue.bursts_enqueued[pQueue.count-1][BURST_LENGTH_INDEX]);
             sourceCurrentIndex++;
         }
         if (pTimer == q) // go to next job
         {
-            //printf("switched %d at %d and %d\n", queueCurrentIndex, timer, pTimer);
-            //printf("switched %d \n", pQueue.bursts_enqueued[queueCurrentIndex][BURST_LENGTH_INDEX]);
-
             queueCurrentIndex = (queueCurrentIndex + 1) % pQueue.count;
             while (pQueue.bursts_enqueued[queueCurrentIndex][BURST_LENGTH_INDEX] == 0)
             {
@@ -265,17 +274,20 @@ double turnaround_time_RR(const int processDataArray[MAXSIZE][DATA_NUMBER], cons
             }
             pTimer = 0;
         }
+        if (pTimer == 0 && pQueue.bursts_enqueued[queueCurrentIndex][BURST_LENGTH_INDEX] == 0
+            && queueCurrentIndex == pQueue.count - 2 )
+        {
+            queueCurrentIndex++;
+        }
         //second consume
         if (consume_from_queue(&pQueue, queueCurrentIndex) == -1)
         {
-            //printf("consumed %d at %d and %d\n", queueCurrentIndex, timer, pTimer);
             pTimer = 0;
-            queueCurrentIndex = (queueCurrentIndex + 1) % pQueue.count;
             int limit = 0;
             while (pQueue.bursts_enqueued[queueCurrentIndex][BURST_LENGTH_INDEX] == 0 && limit < pQueue.count)
             {
-                limit++;
                 queueCurrentIndex = (queueCurrentIndex + 1) % pQueue.count;
+                limit++;
             }
         }
         else
@@ -283,12 +295,15 @@ double turnaround_time_RR(const int processDataArray[MAXSIZE][DATA_NUMBER], cons
             pTimer++;
         }
         update_turnaround_time(&pQueue);
+      //  printf ("current index is: %d and its length is \n", queueCurrentIndex);
+
+      //  printf ("timer is: %d and ptimer is %d\n", timer, pTimer);
         timer++;
     }
     double totalTurnaround = 0.0;
     for (int i = 0; i < pQueue.count; i++)
     {
-        //printf("turnaround tine for this burst is  %d\n", pQueue.bursts_enqueued[i][TIME_TURNAROUND_INDEX]);
+        printf("turnaround tine for this burst is  %d\n", pQueue.bursts_enqueued[i][TIME_TURNAROUND_INDEX]);
         totalTurnaround += pQueue.bursts_enqueued[i][TIME_TURNAROUND_INDEX];
     }
 
@@ -301,7 +316,7 @@ int main()
     prData.count = 0;
 
     FILE *fp;
-    char *name = "input.txt";
+    char *name = "gaps.txt";
     printf("file name %s \n", name);
 
     fp = fopen(name, "r");
@@ -323,11 +338,11 @@ int main()
 
     ProcessesQueue qData;
     qData.count = 0;
-    printf("average turnaround for RR<100> is %.2lf\n", turnaround_time_RR(prData.bursts_info, prData.count, 100));
-    printf("average turnaround for RR<5> is %.2lf\n", turnaround_time_RR(prData.bursts_info, prData.count, 5));
-    printf("average turnaround for FCFS is %.2lf\n", turnaround_time_FCFS(prData.bursts_info, prData.count));
+    //printf("average turnaround for RR<10> is %.2lf\n", turnaround_time_RR(prData.bursts_info, prData.count, 10));
+    printf("average turnaround for RR<5> is %.2lf\n", turnaround_time_RR(prData.bursts_info, prData.count, 6));
+    //printf("average turnaround for FCFS is %.2lf\n", turnaround_time_FCFS(prData.bursts_info, prData.count));
 
-    printf("average turnaround for SJF is %.2lf\n", turnaround_time_SJF(prData.bursts_info, prData.count));
-    printf("average turnaround for SRTF is %.2lf\n", turnaround_time_SRTF(prData.bursts_info, prData.count));
+   // printf("average turnaround for SJF is %.2lf\n", turnaround_time_SJF(prData.bursts_info, prData.count));
+    //printf("average turnaround for SRTF is %.2lf\n", turnaround_time_SRTF(prData.bursts_info, prData.count));
     return 0;
 }
