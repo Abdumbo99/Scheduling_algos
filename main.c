@@ -111,7 +111,7 @@ double turnaround_time_FCFS(const int processDataArray[MAXSIZE][DATA_NUMBER], co
     double totalTurnaround = 0.0;
     for (int i = 0; i < pQueue.count; i++)
     {
-        printf("turnaround tine for this burst is %d \n", pQueue.bursts_enqueued[i][TIME_TURNAROUND_INDEX]);
+        //printf("turnaround tine for this burst is %d \n", pQueue.bursts_enqueued[i][TIME_TURNAROUND_INDEX]);
         totalTurnaround += pQueue.bursts_enqueued[i][TIME_TURNAROUND_INDEX];
     }
     return totalTurnaround / (double)pQueue.count;
@@ -197,7 +197,7 @@ double turnaround_time_SRTF(int const processDataArray[MAXSIZE][DATA_NUMBER], in
     int complate = 0;
     int passedTime = 0;
 
-    dataArray[count + 1][BURST_LENGTH_INDEX] = MAX_BURST_SIZE; // create a burst with max burst size
+    dataArray[count + 1][BURST_LENGTH_INDEX] = MAX_BURST_SIZE + 1; // create a burst with max burst size
     while (complate != count)
     {
         index = count + 1; // set index to max burst
@@ -249,14 +249,14 @@ double turnaround_time_RR(const int processDataArray[MAXSIZE][DATA_NUMBER], cons
         {
             enqueue_process(&pQueue, processDataArray[sourceCurrentIndex][ARRIVAL_TIME_INDEX],
                             processDataArray[sourceCurrentIndex][BURST_LENGTH_INDEX]);
-            printf("added %d at %d and %d\n", sourceCurrentIndex, timer, pTimer);
+            //printf("added %d at %d and %d\n", sourceCurrentIndex, timer, pTimer);
 
             sourceCurrentIndex++;
         }
         if (pTimer == q) // go to next job
         {
-            printf("switched %d at %d and %d\n", queueCurrentIndex, timer, pTimer);
-            printf("switched %d \n", pQueue.bursts_enqueued[queueCurrentIndex][BURST_LENGTH_INDEX]);
+            //printf("switched %d at %d and %d\n", queueCurrentIndex, timer, pTimer);
+            //printf("switched %d \n", pQueue.bursts_enqueued[queueCurrentIndex][BURST_LENGTH_INDEX]);
 
             queueCurrentIndex = (queueCurrentIndex + 1) % pQueue.count;
             while (pQueue.bursts_enqueued[queueCurrentIndex][BURST_LENGTH_INDEX] == 0)
@@ -268,7 +268,7 @@ double turnaround_time_RR(const int processDataArray[MAXSIZE][DATA_NUMBER], cons
         //second consume
         if (consume_from_queue(&pQueue, queueCurrentIndex) == -1)
         {
-            printf("consumed %d at %d and %d\n", queueCurrentIndex, timer, pTimer);
+            //printf("consumed %d at %d and %d\n", queueCurrentIndex, timer, pTimer);
             pTimer = 0;
             queueCurrentIndex = (queueCurrentIndex + 1) % pQueue.count;
             int limit = 0;
@@ -288,7 +288,7 @@ double turnaround_time_RR(const int processDataArray[MAXSIZE][DATA_NUMBER], cons
     double totalTurnaround = 0.0;
     for (int i = 0; i < pQueue.count; i++)
     {
-        printf("turnaround tine for this burst is  %d\n", pQueue.bursts_enqueued[i][TIME_TURNAROUND_INDEX]);
+        //printf("turnaround tine for this burst is  %d\n", pQueue.bursts_enqueued[i][TIME_TURNAROUND_INDEX]);
         totalTurnaround += pQueue.bursts_enqueued[i][TIME_TURNAROUND_INDEX];
     }
 
@@ -323,8 +323,8 @@ int main()
 
     ProcessesQueue qData;
     qData.count = 0;
-    printf("average turnaround for RR is %.2lf\n", turnaround_time_RR(prData.bursts_info, prData.count, 10));
-    printf("average turnaround for RR is %.2lf\n", turnaround_time_RR(prData.bursts_info, prData.count, 5));
+    printf("average turnaround for RR<100> is %.2lf\n", turnaround_time_RR(prData.bursts_info, prData.count, 100));
+    printf("average turnaround for RR<5> is %.2lf\n", turnaround_time_RR(prData.bursts_info, prData.count, 5));
     printf("average turnaround for FCFS is %.2lf\n", turnaround_time_FCFS(prData.bursts_info, prData.count));
 
     printf("average turnaround for SJF is %.2lf\n", turnaround_time_SJF(prData.bursts_info, prData.count));
