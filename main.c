@@ -150,7 +150,7 @@ double turnaround_time_SJF(int const processDataArray[MAXSIZE][DATA_NUMBER], int
         min = dataArray[minIndex][BURST_LENGTH_INDEX];
         /*
             set min burst length to next burst and check
-            if any newly arrived burst has smaller burst time than min burst. 
+            if any newly arrived burst has smaller burst time than min burst.
             If there exist such burst it swaps the bursts by swapping the data values.
          */
         for (int j = minIndex; j < count; j++)
@@ -257,11 +257,11 @@ double turnaround_time_RR(const int processDataArray[MAXSIZE][DATA_NUMBER], cons
                             processDataArray[sourceCurrentIndex][BURST_LENGTH_INDEX]);
             sourceCurrentIndex++;
         }
-        // go to next job
+        // go to next job if necessary
         if (pTimer == q
         || pTimer == 0 && pQueue.bursts_enqueued[queueCurrentIndex][BURST_LENGTH_INDEX] == 0)
         {
-            int limit = 0;// in case queue is all finished but some tasks can still arrive later
+            int limit = 0; // in case queue is all finished but some tasks can still arrive later
             queueCurrentIndex = (queueCurrentIndex + 1) % pQueue.count;
             while (pQueue.bursts_enqueued[queueCurrentIndex][BURST_LENGTH_INDEX] == 0 && limit < pQueue.count)
             {
@@ -269,15 +269,13 @@ double turnaround_time_RR(const int processDataArray[MAXSIZE][DATA_NUMBER], cons
                 limit++;
             }
         }
-        //second consume
+        //then consume
         if (consume_from_queue(&pQueue, queueCurrentIndex) == -1)
-        {
             pTimer = 0;
-        }
+
         else
-        {
             pTimer++;
-        }
+
         update_turnaround_time(&pQueue);
         timer++;
     }
@@ -319,10 +317,10 @@ int main()
     ProcessesQueue qData;
     qData.count = 0;
     //printf("average turnaround for RR<10> is %.2lf\n", turnaround_time_RR(prData.bursts_info, prData.count, 10));
-    printf("average turnaround for RR<5> is %.2lf\n", turnaround_time_RR(prData.bursts_info, prData.count, 6));
+    printf("average turnaround for RR<5> is %.2lf\n", turnaround_time_RR(prData.bursts_info, prData.count, 50));
     printf("average turnaround for FCFS is %.2lf\n", turnaround_time_FCFS(prData.bursts_info, prData.count));
 
-   // printf("average turnaround for SJF is %.2lf\n", turnaround_time_SJF(prData.bursts_info, prData.count));
-    //printf("average turnaround for SRTF is %.2lf\n", turnaround_time_SRTF(prData.bursts_info, prData.count));
+    printf("average turnaround for SJF is %.2lf\n", turnaround_time_SJF(prData.bursts_info, prData.count));
+    printf("average turnaround for SRTF is %.2lf\n", turnaround_time_SRTF(prData.bursts_info, prData.count));
     return 0;
 }
