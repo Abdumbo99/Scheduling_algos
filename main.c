@@ -223,7 +223,8 @@ double turnaround_time_SRTF(int const processDataArray[MAXSIZE][DATA_NUMBER], in
             }
         }
         // process only one time unit
-        dataArray[index][BURST_LENGTH_INDEX]--;
+        if(index != count + 1)
+            dataArray[index][BURST_LENGTH_INDEX]--;
 
         // a burst is end it, add to compete list and calculate turnaround time
         if (dataArray[index][BURST_LENGTH_INDEX] == 0)
@@ -297,7 +298,7 @@ int main()
     prData.count = 0;
 
     FILE *fp;
-    char *name = "gaps.txt";
+    char *name = "input.txt";
     printf("file name %s \n", name);
 
     fp = fopen(name, "r");
