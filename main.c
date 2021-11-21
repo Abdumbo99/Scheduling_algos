@@ -93,8 +93,6 @@ void update_turnaround_time(ProcessesQueue *processesQueue)
 
 int turnaround_time_FCFS(const int processDataArray[MAXSIZE][DATA_NUMBER], const int size)
 {
-    printf("FCFS\n ");
-
     ProcessesQueue pQueue;
     reset_memory(&pQueue);
 
@@ -146,7 +144,6 @@ int turnaround_time_SJF(int const processDataArray[MAXSIZE][DATA_NUMBER], int co
         dataArray[i][ARRIVAL_TIME_INDEX] = processDataArray[i][ARRIVAL_TIME_INDEX];
         dataArray[i][BURST_LENGTH_INDEX] = processDataArray[i][BURST_LENGTH_INDEX];
     }
-    printf("SJF\n");
     double turnaroundAvg = 0, turnaroundTotalTime = 0;
     double passedTime = 0;
     float burstTime = 0;
@@ -213,8 +210,6 @@ int turnaround_time_SRTF(int const processDataArray[MAXSIZE][DATA_NUMBER], int c
         dataArray[i][ARRIVAL_TIME_INDEX] = processDataArray[i][ARRIVAL_TIME_INDEX];
         dataArray[i][BURST_LENGTH_INDEX] = processDataArray[i][BURST_LENGTH_INDEX];
     }
-
-    printf("SRJF\n");
     double turnaroundAvg = 0, turnaroundTotalTime = 0, turnaroundTime = 0;
     float burstTime = 0;
     int index = 1;
@@ -258,7 +253,6 @@ int turnaround_time_SRTF(int const processDataArray[MAXSIZE][DATA_NUMBER], int c
 
 int turnaround_time_RR(const int processDataArray[MAXSIZE][DATA_NUMBER], const int size, int q)
 {
-    printf("RR\n");
     ProcessesQueue pQueue;
     reset_memory(&pQueue);
     pQueue.count = 0;
@@ -320,7 +314,7 @@ int main(int argc, char *argv[])
     FILE *fp;
     char *name = "test.txt";
 
-    fp = fopen(name, "r");
+    fp = fopen(fileName, "r");
     if (fp != NULL)
     {
         int index;
