@@ -312,8 +312,6 @@ int main(int argc, char *argv[])
     strcpy(fileName, argv[1]);
     const int QUANTA = atoi(argv[2]);
     FILE *fp;
-    char *name = "test.txt";
-
     fp = fopen(fileName, "r");
     if (fp != NULL)
     {
@@ -338,10 +336,10 @@ int main(int argc, char *argv[])
         printf("[INVALID VALUE] the value is %d is not in the limits, RR will not run", QUANTA);
     }
     else
-       printf("RR<%d> %d\n", QUANTA, turnaround_time_RR(prData.bursts_info, prData.count, QUANTA));
+       printf("RR\t%d\n", turnaround_time_RR(prData.bursts_info, prData.count, QUANTA));
 
-    printf("FCFS %d\n", turnaround_time_FCFS(prData.bursts_info, prData.count));
-    printf("SJF %d\n", turnaround_time_SJF(prData.bursts_info, prData.count));
-    printf("SRTF %d\n", turnaround_time_SRTF(prData.bursts_info, prData.count));
+    printf("FCFS\t%d\n", turnaround_time_FCFS(prData.bursts_info, prData.count));
+    printf("SJF\t%d\n", turnaround_time_SJF(prData.bursts_info, prData.count));
+    printf("SRTF\t%d\n", turnaround_time_SRTF(prData.bursts_info, prData.count));
     return 0;
 }
