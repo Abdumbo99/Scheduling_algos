@@ -1,7 +1,13 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 #define MAXSIZE 1000
-#define MAX_BURST_SIZE 400
-#define MIN_BURST_SIZE 5
+#define MAX_BURST_LENGTH 400
+#define MIN_BURST_LENGTH 5
+#define MIN_QUANTA 10
+#define MAX_QUANTA 300
+#define FILE_NAME_LENGTH 50
 
 #define DATA_NUMBER 3       //2nd dimension of bursts
 #define QUEUE_DATA_NUMBER 4 //2nd dimension of queue
@@ -85,7 +91,7 @@ void update_turnaround_time(ProcessesQueue *processesQueue)
     }
 }
 
-double turnaround_time_FCFS(const int processDataArray[MAXSIZE][DATA_NUMBER], const int size)
+int turnaround_time_FCFS(const int processDataArray[MAXSIZE][DATA_NUMBER], const int size)
 {
     printf("FCFS\n ");
 
@@ -122,10 +128,14 @@ double turnaround_time_FCFS(const int processDataArray[MAXSIZE][DATA_NUMBER], co
         //printf("turnaround tine for this burst is %d \n", pQueue.bursts_enqueued[i][TIME_TURNAROUND_INDEX]);
         totalTurnaround += pQueue.bursts_enqueued[i][TIME_TURNAROUND_INDEX];
     }
-    return totalTurnaround / (double)pQueue.count;
+    double realAvg = totalTurnaround / (double)pQueue.count;
+    int avgTurnaround = (int) realAvg;
+    if (realAvg - (double) avgTurnaround > 0.5)
+        avgTurnaround++;
+    return avgTurnaround;
 }
 
-double turnaround_time_SJF(int const processDataArray[MAXSIZE][DATA_NUMBER], int const count)
+int turnaround_time_SJF(int const processDataArray[MAXSIZE][DATA_NUMBER], int const count)
 {
     // temp array
     int dataArray[MAXSIZE][DATA_NUMBER];
@@ -185,11 +195,14 @@ double turnaround_time_SJF(int const processDataArray[MAXSIZE][DATA_NUMBER], int
         double turaroundTime = passedTime - dataArray[i][ARRIVAL_TIME_INDEX];
         turnaroundTotalTime = turnaroundTotalTime + turaroundTime;
     }
-    turnaroundAvg = turnaroundTotalTime / count;
-    return turnaroundAvg;
+    double realAvg = turnaroundTotalTime / count;
+    int avgTurnaround = (int) realAvg;
+    if (realAvg - (double) avgTurnaround > 0.5)
+        avgTurnaround++;
+    return avgTurnaround;
 }
 
-double turnaround_time_SRTF(int const processDataArray[MAXSIZE][DATA_NUMBER], int const count)
+int turnaround_time_SRTF(int const processDataArray[MAXSIZE][DATA_NUMBER], int const count)
 {
     // temp array with same data values as processDataArray
     int dataArray[MAXSIZE+1][DATA_NUMBER];
@@ -208,7 +221,7 @@ double turnaround_time_SRTF(int const processDataArray[MAXSIZE][DATA_NUMBER], in
     int complate = 0;
     int passedTime = 0;
 
-    dataArray[count + 1][BURST_LENGTH_INDEX] = MAX_BURST_SIZE + 1; // create a burst with max burst size
+    dataArray[count + 1][BURST_LENGTH_INDEX] = MAX_BURST_LENGTH + 1; // create a burst with max burst size
     while (complate != count)
     {
         index = count + 1; // set index to max burst
@@ -236,12 +249,14 @@ double turnaround_time_SRTF(int const processDataArray[MAXSIZE][DATA_NUMBER], in
         }
         passedTime++;
     }
-
-    turnaroundAvg = turnaroundTotalTime / count;
-    return turnaroundAvg;
+    double realAvg = turnaroundTotalTime / count;
+    int avgTurnaround = (int) realAvg;
+    if (realAvg - (double) avgTurnaround > 0.5)
+        avgTurnaround++;
+    return avgTurnaround;
 }
 
-double turnaround_time_RR(const int processDataArray[MAXSIZE][DATA_NUMBER], const int size, int q)
+int turnaround_time_RR(const int processDataArray[MAXSIZE][DATA_NUMBER], const int size, int q)
 {
     printf("RR\n");
     ProcessesQueue pQueue;
@@ -289,16 +304,22 @@ double turnaround_time_RR(const int processDataArray[MAXSIZE][DATA_NUMBER], cons
     //    printf("turnaround tine for this burst is  %d\n", pQueue.bursts_enqueued[i][TIME_TURNAROUND_INDEX]);
         totalTurnaround += pQueue.bursts_enqueued[i][TIME_TURNAROUND_INDEX];
     }
-    return totalTurnaround / (double)pQueue.count;
+    double realAvg = totalTurnaround / (double)pQueue.count;
+    int avgTurnaround = (int) realAvg;
+    if (realAvg - (double) avgTurnaround > 0.5)
+        avgTurnaround++;
+    return avgTurnaround;
 }
 
-int main()
+int main(int argc, char *argv[])
 {
     ProcessesData prData;
     prData.count = 0;
-
+    char fileName[FILE_NAME_LENGTH];
+    strcpy(fileName, argv[1]);
+    const int QUANTA = atoi(argv[2]);
     FILE *fp;
-    char *name = "input.txt";
+    char *name = "test.txt";
     printf("file name %s \n", name);
 
     fp = fopen(name, "r");
@@ -309,7 +330,11 @@ int main()
         int burstTime;
         while (fscanf(fp, "%d %d %d", &index, &arrivalTime, &burstTime) != EOF)
         {
-            add_process_data(&prData, arrivalTime, burstTime);
+            if (burstTime > MAX_BURST_LENGTH || burstTime < MIN_BURST_LENGTH ) {
+                printf("[INVALID VALUE] the value is %d is not in the limits, will not be added\n", burstTime);
+            }
+            else
+                add_process_data(&prData, arrivalTime, burstTime);
         }
     }
 
@@ -321,10 +346,15 @@ int main()
     ProcessesQueue qData;
     qData.count = 0;
     //printf("average turnaround for RR<10> is %.2lf\n", turnaround_time_RR(prData.bursts_info, prData.count, 10));
-    printf("average turnaround for RR<5> is %.2lf\n", turnaround_time_RR(prData.bursts_info, prData.count, 20));
-    printf("average turnaround for FCFS is %.2lf\n", turnaround_time_FCFS(prData.bursts_info, prData.count));
+    if (QUANTA > MAX_QUANTA || QUANTA < MIN_QUANTA){
+        printf("[INVALID VALUE] the value is %d is not in the limits, RR will not run", QUANTA);
+    }
+    else
+       printf("RR<%d> %d\n", QUANTA, turnaround_time_RR(prData.bursts_info, prData.count, QUANTA));
 
-    printf("average turnaround for SJF is %.2lf\n", turnaround_time_SJF(prData.bursts_info, prData.count));
-    printf("average turnaround for SRTF is %.2lf\n", turnaround_time_SRTF(prData.bursts_info, prData.count));
+    printf("FCFS %d\n", turnaround_time_FCFS(prData.bursts_info, prData.count));
+
+    printf("SJF %d\n", turnaround_time_SJF(prData.bursts_info, prData.count));
+    printf("SRTF is %d\n", turnaround_time_SRTF(prData.bursts_info, prData.count));
     return 0;
 }
