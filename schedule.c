@@ -40,10 +40,7 @@ void add_process_data(ProcessesData *processData, int arrivalTime, int burstLeng
     processData->count++;
 }
 
-/*
- * As we are progressing with processing of the bursts we keep ones with past arrival time here
- * We update turnaround time as they get processed.
-*/
+
 void reset_memory(ProcessesQueue *processesQueue)
 {
     int i;
@@ -127,7 +124,6 @@ int turnaround_time_FCFS(const int processDataArray[MAXSIZE][DATA_NUMBER], const
     int i;
     for ( i = 0; i < pQueue.count; i++)
     {
-        //printf("turnaround tine for this burst is %d \n", pQueue.bursts_enqueued[i][TIME_TURNAROUND_INDEX]);
         totalTurnaround += pQueue.bursts_enqueued[i][TIME_TURNAROUND_INDEX];
     }
     double realAvg = totalTurnaround / (double)pQueue.count;
