@@ -332,6 +332,8 @@ int main(int argc, char *argv[])
 
     ProcessesQueue qData;
     qData.count = 0;
+
+
     if (QUANTA > MAX_QUANTA || QUANTA < MIN_QUANTA){
         printf("[INVALID VALUE] the value is %d is not in the limits, RR will not run", QUANTA);
     }
@@ -339,8 +341,7 @@ int main(int argc, char *argv[])
        printf("RR<%d> %d\n", QUANTA, turnaround_time_RR(prData.bursts_info, prData.count, QUANTA));
 
     printf("FCFS %d\n", turnaround_time_FCFS(prData.bursts_info, prData.count));
-
     printf("SJF %d\n", turnaround_time_SJF(prData.bursts_info, prData.count));
-    printf("SRTF is %d\n", turnaround_time_SRTF(prData.bursts_info, prData.count));
+    printf("SRTF %d\n", turnaround_time_SRTF(prData.bursts_info, prData.count));
     return 0;
 }
