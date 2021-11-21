@@ -301,7 +301,6 @@ int turnaround_time_RR(const int processDataArray[MAXSIZE][DATA_NUMBER], const i
     double totalTurnaround = 0.0;
     for (int i = 0; i < pQueue.count; i++)
     {
-    //    printf("turnaround tine for this burst is  %d\n", pQueue.bursts_enqueued[i][TIME_TURNAROUND_INDEX]);
         totalTurnaround += pQueue.bursts_enqueued[i][TIME_TURNAROUND_INDEX];
     }
     double realAvg = totalTurnaround / (double)pQueue.count;
@@ -320,7 +319,6 @@ int main(int argc, char *argv[])
     const int QUANTA = atoi(argv[2]);
     FILE *fp;
     char *name = "test.txt";
-    printf("file name %s \n", name);
 
     fp = fopen(name, "r");
     if (fp != NULL)
@@ -338,14 +336,8 @@ int main(int argc, char *argv[])
         }
     }
 
-    for (int i = 0; i < prData.count; i++)
-    {
-        //printf("count is %d and arrival time %d and length is %d \n", prData.count, prData.bursts_info[i][1], prData.bursts_info[i][2]);
-    }
-
     ProcessesQueue qData;
     qData.count = 0;
-    //printf("average turnaround for RR<10> is %.2lf\n", turnaround_time_RR(prData.bursts_info, prData.count, 10));
     if (QUANTA > MAX_QUANTA || QUANTA < MIN_QUANTA){
         printf("[INVALID VALUE] the value is %d is not in the limits, RR will not run", QUANTA);
     }
