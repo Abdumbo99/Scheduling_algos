@@ -46,9 +46,11 @@ void add_process_data(ProcessesData *processData, int arrivalTime, int burstLeng
 */
 void reset_memory(ProcessesQueue *processesQueue)
 {
-    for (int i = 0; i < MAXSIZE; i++)
+    int i;
+    for ( i = 0; i < MAXSIZE; i++)
     {
-        for (int j = 0; j < QUEUE_DATA_NUMBER; j++)
+        int j;
+        for ( j = 0; j < QUEUE_DATA_NUMBER; j++)
         {
             processesQueue->bursts_enqueued[i][j] = 0;
         }
@@ -82,7 +84,8 @@ int consume_from_queue(ProcessesQueue *processesQueue, int index)
 
 void update_turnaround_time(ProcessesQueue *processesQueue)
 {
-    for (int i = 0; i < processesQueue->count; i++)
+    int i;
+    for ( i = 0; i < processesQueue->count; i++)
     {
         if (processesQueue->bursts_enqueued[i][BURST_LENGTH_INDEX] > 0)
         {
@@ -121,7 +124,8 @@ int turnaround_time_FCFS(const int processDataArray[MAXSIZE][DATA_NUMBER], const
         timer++;
     }
     double totalTurnaround = 0.0;
-    for (int i = 0; i < pQueue.count; i++)
+    int i;
+    for ( i = 0; i < pQueue.count; i++)
     {
         //printf("turnaround tine for this burst is %d \n", pQueue.bursts_enqueued[i][TIME_TURNAROUND_INDEX]);
         totalTurnaround += pQueue.bursts_enqueued[i][TIME_TURNAROUND_INDEX];
@@ -138,7 +142,8 @@ int turnaround_time_SJF(int const processDataArray[MAXSIZE][DATA_NUMBER], int co
     // temp array
     int dataArray[MAXSIZE][DATA_NUMBER];
 
-    for (int i = 0; i < count; i++)
+    int i;
+    for ( i = 0; i < count; i++)
     {
         dataArray[i][BURST_NUMBER_INDEX] = processDataArray[i][BURST_NUMBER_INDEX];
         dataArray[i][ARRIVAL_TIME_INDEX] = processDataArray[i][ARRIVAL_TIME_INDEX];
@@ -149,7 +154,7 @@ int turnaround_time_SJF(int const processDataArray[MAXSIZE][DATA_NUMBER], int co
     float burstTime = 0;
     int min;
     int minIndex = 1;
-    for (int i = 0; i < count; i++)
+    for ( i = 0; i < count; i++)
     {
         // execute burst, increase burst time
         burstTime = burstTime + dataArray[i][BURST_LENGTH_INDEX];
@@ -160,7 +165,8 @@ int turnaround_time_SJF(int const processDataArray[MAXSIZE][DATA_NUMBER], int co
             if any newly arrived burst has smaller burst time than min burst.
             If there exist such burst it swaps the bursts by swapping the data values.
          */
-        for (int j = minIndex; j < count; j++)
+        int j;
+        for ( j = minIndex;j < count; j++)
         {
             if (burstTime >= dataArray[j][ARRIVAL_TIME_INDEX] && dataArray[j][BURST_LENGTH_INDEX] < min)
             {
@@ -184,7 +190,7 @@ int turnaround_time_SJF(int const processDataArray[MAXSIZE][DATA_NUMBER], int co
         minIndex++;
     }
 
-    for (int i = 0; i < count; i++)
+    for (i = 0; i < count; i++)
     {
         if(passedTime < dataArray[i][ARRIVAL_TIME_INDEX])
             passedTime = dataArray[i][ARRIVAL_TIME_INDEX];
@@ -204,7 +210,8 @@ int turnaround_time_SRTF(int const processDataArray[MAXSIZE][DATA_NUMBER], int c
     // temp array with same data values as processDataArray
     int dataArray[MAXSIZE+1][DATA_NUMBER];
 
-    for (int i = 0; i < count; i++)
+    int i;
+    for ( i = 0;  i < count; i++)
     {
         dataArray[i][BURST_NUMBER_INDEX] = processDataArray[i][BURST_NUMBER_INDEX];
         dataArray[i][ARRIVAL_TIME_INDEX] = processDataArray[i][ARRIVAL_TIME_INDEX];
@@ -222,7 +229,7 @@ int turnaround_time_SRTF(int const processDataArray[MAXSIZE][DATA_NUMBER], int c
         index = count + 1; // set index to max burst
 
         // pick the burst with minimum burst length from the arrived ones
-        for (int i = 0; i < count; i++)
+        for (i = 0; i < count; i++)
         {
             if (dataArray[i][BURST_LENGTH_INDEX] < dataArray[index][BURST_LENGTH_INDEX] &&
                 passedTime >= dataArray[i][ARRIVAL_TIME_INDEX] && dataArray[i][BURST_LENGTH_INDEX] > 0)
@@ -293,7 +300,8 @@ int turnaround_time_RR(const int processDataArray[MAXSIZE][DATA_NUMBER], const i
         timer++;
     }
     double totalTurnaround = 0.0;
-    for (int i = 0; i < pQueue.count; i++)
+    int i;
+    for ( i = 0;  i < pQueue.count; i++)
     {
         totalTurnaround += pQueue.bursts_enqueued[i][TIME_TURNAROUND_INDEX];
     }
